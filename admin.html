@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Admin Panel</title>
+
+    <style>
+      body {
+        background: #020617;
+        color: white;
+        font-family: Arial;
+        padding: 20px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #334155;
+        text-align: left;
+      }
+
+      th {
+        background: #1e293b;
+      }
+
+      tr:hover {
+        background: #1e293b;
+      }
+
+      /* Delete Button */
+      .delete-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .delete-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Admin Panel - Contacts</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableData"></tbody>
+    </table>
+
+    <script>
+      // LOAD DATA
+      async function loadData() {
+        try {
+          let res = await fetch("http://localhost:5000/contacts");
+          let data = await res.json();
+
+          let html = "";
+
+          data.forEach((item) => {
+            html += `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.email}</td>
+          <td>${item.address}</td>
+          <td>
+            <button class="delete-btn" onclick="deleteData('${item._id}')">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `;
+          });
+
+          document.getElementById("tableData").innerHTML = html;
+        } catch (error) {
+          console.log("Error loading data:", error);
+        }
+      }
+
+      // DELETE DATA
+      async function deleteData(id) {
+        let confirmDelete = confirm("Delete this item?");
+        if (!confirmDelete) return;
+
+        try {
+          let res = await fetch(`http://localhost:5000/contact/${id}`, {
+            method: "DELETE",
+          });
+
+          //   let data = await res.text();
+          //   alert(data);
+
+          loadData(); // refresh
+        } catch (error) {
+          console.log("Delete error:", error);
+          alert("Delete failed ❌");
+        }
+      }
+
+      // AUTO LOAD
+      loadData();
+    </script>
+  </body>
+</html>
